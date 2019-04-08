@@ -1,4 +1,4 @@
-#Attention-based Graph Neural Network
+Attention-based Graph Neural Network
 ============
 Related Works
 ------------
@@ -9,11 +9,12 @@ Related Works
 
 Library Needed
 ------------
-- torch v1.0
+- torch
 - dgl
+- numpy
 
 
-Running Instruction
+Running Samples
 ----------
 
 
