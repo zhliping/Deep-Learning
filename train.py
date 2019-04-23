@@ -7,6 +7,7 @@ from dgl import DGLGraph
 from dgl.data import register_data_args, load_data
 from GAT import GAT
 from MLPGAT import MLPGAT
+from MLPGAT_1 import MLPGAT_1
 from GCN import GCN
 
 def accuracy(logits, labels):
@@ -62,7 +63,7 @@ def main(args):
     g.add_edges(g.nodes(), g.nodes())
     # create model
     heads = ([args.num_heads] * args.num_layers) + [args.num_out_heads]
-    model = MLPGAT(g,
+    model = MLPGAT_1(g,
                 args.num_layers,
                 num_feats,
                 args.num_hidden,
