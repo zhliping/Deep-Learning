@@ -6,6 +6,7 @@ import torch.nn.functional as F
 from dgl import DGLGraph
 from dgl.data import register_data_args, load_data
 from GAT import GAT
+from MLPGAT import MLPGAT
 
 def accuracy(logits, labels):
     _, indices = torch.max(logits, dim=1)
@@ -60,7 +61,7 @@ def main(args):
     g.add_edges(g.nodes(), g.nodes())
     # create model
     heads = ([args.num_heads] * args.num_layers) + [args.num_out_heads]
-    model = GAT(g,
+    model = MLPGAT(g,
                 args.num_layers,
                 num_feats,
                 args.num_hidden,
