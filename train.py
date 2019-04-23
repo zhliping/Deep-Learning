@@ -7,6 +7,7 @@ from dgl import DGLGraph
 from dgl.data import register_data_args, load_data
 from GAT import GAT
 from MLPGAT import MLPGAT
+from GCN import GCN
 
 def accuracy(logits, labels):
     _, indices = torch.max(logits, dim=1)
@@ -72,6 +73,8 @@ def main(args):
                 args.attn_drop,
                 args.alpha,
                 args.residual)
+
+    #model = GCN(g, num_feats, args.num_hidden, n_classes, args.num_layers, F.relu, args.in_drop)
     print(model)
     if cuda:
         model.cuda()
@@ -117,7 +120,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='GAT')
     register_data_args(parser)
-    parser.add_argument("--gpu", type=int, default=-1,
+    parser.add_argument("--gpu", type=int, default=0,
                         help="which GPU to use. Set -1 to use CPU.")
     parser.add_argument("--epochs", type=int, default=200,
                         help="number of training epochs")
