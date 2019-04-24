@@ -7,7 +7,7 @@ class MLP(nn.Module):
     def __init__(self, input_size, hidden_size, num_classes, alpha):
         super(MLP, self).__init__()
         self.fc1 = nn.Linear(input_size, num_classes) 
-        #self.leaky_relu = nn.LeakyReLU(alpha)
+        self.leaky_relu = nn.LeakyReLU(alpha)
         # self.relu = nn.ReLU()
         # self.fc2 = nn.Linear(hidden_size, num_classes)  
         nn.init.xavier_normal_(self.fc1.weight.data, gain=1.414)
@@ -60,8 +60,7 @@ class GraphAttention(nn.Module):
     def forward(self, inputs):
         # prepare
         h = self.feat_drop(inputs)  # NxD
-        ft = self.fc(h)  # Nx(HxD)
-        ft = self.mlp(ft).reshape((h.shape[0], self.num_heads, -1)) # NxHxD
+        ft = self.fc(h).reshape((h.shape[0], self.num_heads, -1))  # NxHxD'
         head_ft = ft.transpose(0, 1)  # HxNxD'
         a1 = torch.bmm(head_ft, self.attn_l).transpose(0, 1)  # NxHx1
         a2 = torch.bmm(head_ft, self.attn_r).transpose(0, 1)  # NxHx1
@@ -76,6 +75,7 @@ class GraphAttention(nn.Module):
         # 3. apply normalizer
         ret = self.g.ndata['ft'] / self.g.ndata['z']  # NxHxD'
 
+        ret = self.mlp(ret.reshape(h.shape[0], -1)).reshape((h.shape[0], self.num_heads, -1))
         # 4. residual
         if self.residual:
             if self.res_fc is not None:
@@ -99,7 +99,7 @@ class GraphAttention(nn.Module):
 
 
 
-class MLPGAT_1(nn.Module):
+class MLPGAT_average(nn.Module):
     def __init__(self,
                  g,
                  num_layers,
@@ -112,7 +112,8 @@ class MLPGAT_1(nn.Module):
                  attn_drop,
                  alpha,
                  residual):
-        super(MLPGAT_1, self).__init__()
+        super(MLPGAT_average, self).__init__()
+        num_hidden = num_classes
         self.g = g
         self.num_layers = num_layers
         self.gat_layers = nn.ModuleList()
@@ -133,9 +134,22 @@ class MLPGAT_1(nn.Module):
 
     def forward(self, inputs):
         h = inputs
+        res = None
         for l in range(self.num_layers):
+            logits = self.gat_layers[l](h).mean(1)
+            logits = logits.reshape(logits.shape[0], -1, 1)
+            if res is None:
+                res = logits
+            else:
+                res = torch.cat([res, logits], 2)
             h = self.gat_layers[l](h).flatten(1)
             h = self.activation(h)
         # output projection
         logits = self.gat_layers[-1](h).mean(1)
-        return logits
+        logits = logits.reshape(logits.shape[0], -1, 1)
+        if res is None:
+            res = logits
+        else:
+            res = torch.cat([res, logits], 2)
+        #print(res.shape)
+        return res.mean(2)

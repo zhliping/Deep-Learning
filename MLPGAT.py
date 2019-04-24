@@ -8,14 +8,15 @@ class MLP(nn.Module):
         super(MLP, self).__init__()
         self.fc1 = nn.Linear(input_size, num_classes) 
         self.leaky_relu = nn.LeakyReLU(alpha)
-        # self.relu = nn.ReLU()
-        # self.fc2 = nn.Linear(hidden_size, num_classes)  
+        #self.relu = nn.ReLU()
+        #self.fc2 = nn.Linear(hidden_size, num_classes)  
         nn.init.xavier_normal_(self.fc1.weight.data, gain=1.414)
-        # nn.init.xavier_normal_(self.fc2.weight.data, gain=1.414)
+        #nn.init.xavier_normal_(self.fc2.weight.data, gain=1.414)
     
     def forward(self, x):
         out = self.fc1(x)
         out = self.leaky_relu(out)
+        #out = self.relu(out)
         #out = self.fc2(out)
         return out
 
@@ -31,9 +32,11 @@ class GraphAttention(nn.Module):
                  residual=False):
         super(GraphAttention, self).__init__()
         self.g = g
-        self.mlp = MLP(out_dim * num_heads, 2 * out_dim * num_heads, out_dim * num_heads, alpha)
+        self.mlp = MLP(out_dim * num_heads, 2 * num_heads * out_dim, out_dim * num_heads, alpha)
+        #self.mlp = MLP(in_dim * num_heads, 2 * num_heads * out_dim, out_dim * num_heads, alpha)
         self.num_heads = num_heads
         self.fc = nn.Linear(in_dim, num_heads * out_dim, bias=False)
+        #self.fc = nn.Linear(in_dim, num_heads * in_dim, bias=False)
         if feat_drop:
             self.feat_drop = nn.Dropout(feat_drop)
         else:
@@ -44,6 +47,9 @@ class GraphAttention(nn.Module):
             self.attn_drop = lambda x : x
         self.attn_l = nn.Parameter(torch.Tensor(size=(num_heads, out_dim, 1)))
         self.attn_r = nn.Parameter(torch.Tensor(size=(num_heads, out_dim, 1)))
+        #self.attn_l = nn.Parameter(torch.Tensor(size=(num_heads, in_dim, 1)))
+        #self.attn_r = nn.Parameter(torch.Tensor(size=(num_heads, in_dim, 1)))
+
         nn.init.xavier_normal_(self.fc.weight.data, gain=1.414)
         nn.init.xavier_normal_(self.attn_l.data, gain=1.414)
         nn.init.xavier_normal_(self.attn_r.data, gain=1.414)

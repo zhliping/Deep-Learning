@@ -9,6 +9,7 @@ from GAT import GAT
 from MLPGAT import MLPGAT
 from MLPGAT_1 import MLPGAT_1
 from GCN import GCN
+from MLPGAT_average import MLPGAT_average
 
 def accuracy(logits, labels):
     _, indices = torch.max(logits, dim=1)
@@ -63,7 +64,7 @@ def main(args):
     g.add_edges(g.nodes(), g.nodes())
     # create model
     heads = ([args.num_heads] * args.num_layers) + [args.num_out_heads]
-    model = MLPGAT_1(g,
+    model = GAT_average(g,
                 args.num_layers,
                 num_feats,
                 args.num_hidden,
@@ -121,7 +122,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='GAT')
     register_data_args(parser)
-    parser.add_argument("--gpu", type=int, default=0,
+    parser.add_argument("--gpu", type=int, default=-1,
                         help="which GPU to use. Set -1 to use CPU.")
     parser.add_argument("--epochs", type=int, default=200,
                         help="number of training epochs")
@@ -129,7 +130,7 @@ if __name__ == '__main__':
                         help="number of hidden attention heads")
     parser.add_argument("--num-out-heads", type=int, default=1,
                         help="number of output attention heads")
-    parser.add_argument("--num-layers", type=int, default=1,
+    parser.add_argument("--num-layers", type=int, default=2,
                         help="number of hidden layers")
     parser.add_argument("--num-hidden", type=int, default=8,
                         help="number of hidden units")
