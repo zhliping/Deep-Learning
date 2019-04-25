@@ -7,7 +7,7 @@ class MLP(nn.Module):
     def __init__(self, input_size, hidden_size, num_classes, alpha):
         super(MLP, self).__init__()
         self.fc1 = nn.Linear(input_size, num_classes) 
-        #self.leaky_relu = nn.LeakyReLU(alpha)
+        self.leaky_relu = nn.LeakyReLU(alpha)
         # self.relu = nn.ReLU()
         # self.fc2 = nn.Linear(hidden_size, num_classes)  
         nn.init.xavier_normal_(self.fc1.weight.data, gain=1.414)

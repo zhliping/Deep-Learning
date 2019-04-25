@@ -64,7 +64,47 @@ def main(args):
     g.add_edges(g.nodes(), g.nodes())
     # create model
     heads = ([args.num_heads] * args.num_layers) + [args.num_out_heads]
-    model = GAT_average(g,
+    type_model = args.model
+    if type_model == 1:
+        model = GCN(g, num_feats, args.num_hidden, n_classes, args.num_layers, F.relu, args.in_drop)
+    elif type_model == 2:
+        model = GAT(g,
+                args.num_layers,
+                num_feats,
+                args.num_hidden,
+                n_classes,
+                heads,
+                F.elu,
+                args.in_drop,
+                args.attn_drop,
+                args.alpha,
+                args.residual)
+    elif type_model == 3:
+        model = MLPGAT(g,
+                args.num_layers,
+                num_feats,
+                args.num_hidden,
+                n_classes,
+                heads,
+                F.elu,
+                args.in_drop,
+                args.attn_drop,
+                args.alpha,
+                args.residual)
+    elif type_model == 4:
+        model = MLPGAT_1(g,
+                args.num_layers,
+                num_feats,
+                args.num_hidden,
+                n_classes,
+                heads,
+                F.elu,
+                args.in_drop,
+                args.attn_drop,
+                args.alpha,
+                args.residual)
+    else:
+        model = MLPGAT_average(g,
                 args.num_layers,
                 num_feats,
                 args.num_hidden,
@@ -130,7 +170,7 @@ if __name__ == '__main__':
                         help="number of hidden attention heads")
     parser.add_argument("--num-out-heads", type=int, default=1,
                         help="number of output attention heads")
-    parser.add_argument("--num-layers", type=int, default=2,
+    parser.add_argument("--num-layers", type=int, default=1,
                         help="number of hidden layers")
     parser.add_argument("--num-hidden", type=int, default=8,
                         help="number of hidden units")
@@ -148,6 +188,9 @@ if __name__ == '__main__':
                         help="the negative slop of leaky relu")
     parser.add_argument('--fastmode', action="store_true", default=False,
                         help="skip re-evaluate the validation set")
+    parser.add_argument('--model', type=int, default=1,
+                        help="model selection")
+
     args = parser.parse_args()
     print(args)
 
