@@ -60,8 +60,8 @@ class GraphAttention(nn.Module):
     def forward(self, inputs):
         # prepare
         h = self.feat_drop(inputs)  # NxD
-        ft = self.fc(h)  # Nx(HxD)
-        ft = self.mlp(ft).reshape((h.shape[0], self.num_heads, -1)) # NxHxD
+        ft = self.fc(h).reshape((h.shape[0], self.num_heads, -1))  # NxHxD
+        #ft = self.mlp(ft).reshape((h.shape[0], self.num_heads, -1)) # NxHxD
         head_ft = ft.transpose(0, 1)  # HxNxD'
         a1 = torch.bmm(head_ft, self.attn_l).transpose(0, 1)  # NxHx1
         a2 = torch.bmm(head_ft, self.attn_r).transpose(0, 1)  # NxHx1
@@ -75,6 +75,8 @@ class GraphAttention(nn.Module):
         self.g.update_all(fn.src_mul_edge('ft', 'a_drop', 'ft'), fn.sum('ft', 'ft'))
         # 3. apply normalizer
         ret = self.g.ndata['ft'] / self.g.ndata['z']  # NxHxD'
+        ret = ret.reshape((h.shape[0], -1))
+        ret = self.mlp(ret).reshape((h.shape[0], self.num_heads, -1))
 
         # 4. residual
         if self.residual:

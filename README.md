@@ -18,7 +18,7 @@ Running Instructions
 ----------
 - We have three dataset "cora", "citeseer" and "pubmed". To specify which dataset to use, use --dataset on the command line.
 - To use GPU, use --gpu=0 on the command line.
-- We have five models: 1(GCN), 2(GAT), 3(MLPGAT), 4(MLPGAT_1), 5(MLPGAT_average). To select model, use --model on the command line.
+- We have five models: 1(GCN), 2(GAT), 3(MLPGAT), 4(MLPGAT_1), 5(MLPGAT_average), 6(ENSEMBLE of 3,4,5). To select model, use --model on the command line.
 - To change the hyperparameters of training, check the code in train.py for details.
 
 

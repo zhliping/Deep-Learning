@@ -10,6 +10,7 @@ from MLPGAT import MLPGAT
 from MLPGAT_1 import MLPGAT_1
 from GCN import GCN
 from MLPGAT_average import MLPGAT_average
+from ENSEMBLE import ENSEMBLE
 
 def accuracy(logits, labels):
     _, indices = torch.max(logits, dim=1)
@@ -103,7 +104,7 @@ def main(args):
                 args.attn_drop,
                 args.alpha,
                 args.residual)
-    else:
+    elif type_model == 5:
         model = MLPGAT_average(g,
                 args.num_layers,
                 num_feats,
@@ -115,6 +116,19 @@ def main(args):
                 args.attn_drop,
                 args.alpha,
                 args.residual)
+    else:
+        model = ENSEMBLE(g,
+                args.num_layers,
+                num_feats,
+                args.num_hidden,
+                n_classes,
+                heads,
+                F.elu,
+                args.in_drop,
+                args.attn_drop,
+                args.alpha,
+                args.residual)
+
 
     #model = GCN(g, num_feats, args.num_hidden, n_classes, args.num_layers, F.relu, args.in_drop)
     print(model)
